@@ -9,16 +9,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const toggleKeyboard = () => keyboard.style.top = keyboard.style.top ? '' : '50%';
 
+    const changeLang = (buttons, lang) => {
+      const langRu = ['ё', 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '-', '=', '⬅',
+        'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ',
+        'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э',
+        'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.',
+        'en', ' '
+      ];
+      const langEn = ['`', 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '-', '=', '⬅',
+        'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']',
+        'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '"',
+        'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
+        'ru', ' '
+      ];
+      if (lang === 'en') {
+        buttons.forEach((btn, index) => {
+          btn.textContent = langEn[index];
+        })
+      } else {
+        buttons.forEach((btn, index) => {
+          btn.textContent = langRu[index];
+        })
+      }
+    }
+
     const typing = (event) => {
       const target = event.target;
 
       if (target.tagName.toLowerCase() === 'button') {
+        const targetTrim = target.textContent.trim();
+        const buttons = [...keyboard.querySelectorAll('button')].filter(elem => elem.style.visibility !== 'hidden');
+
         if (target.id === 'keyboard-backspace') {
-          searchInput.value = searchInput.value.slice(0, length - 1);
-        } else if (!target.textContent.trim()) {
+          searchInput.value = searchInput.value.slice(0, -1);
+        } else if (!targetTrim) {
           searchInput.value += ' ';
+        } else if (targetTrim === 'en' || 'ru') {
+          changeLang(buttons, targetTrim)
         } else {
-          searchInput.value += target.textContent.trim();
+          searchInput.value += targetTrim;
         }
       }
     }
