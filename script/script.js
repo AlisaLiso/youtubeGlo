@@ -13,10 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const target = event.target;
 
       if (target.tagName.toLowerCase() === 'button') {
-        
         if (target.id === 'keyboard-backspace') {
-          searchInput.value = searchInput.value.slice(0, searchInput.value.length - 1);
-        } else if (target.textContent.trim() === '') {
+          searchInput.value = searchInput.value.slice(0, length - 1);
+        } else if (!target.textContent.trim()) {
           searchInput.value += ' ';
         } else {
           searchInput.value += target.textContent.trim();
