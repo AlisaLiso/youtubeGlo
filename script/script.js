@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             width: ${qw[i]}px;
             height: ${qh[i]}px;
           `;
-          
+
           youtuberContainer.style.cssText = `
             width: ${qw[i]}px;
             height: ${qh[i]}px;
@@ -132,9 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const youtuberFrame = document.createElement('iframe');
         youtuberFrame.src = `https://youtube.com/embed/${idVideo}`;
         youtuberContainer.insertAdjacentElement('beforeend', youtuberFrame);
-        
+
         window.addEventListener('resize', sizeVideo);
-        
+
         sizeVideo();
       })
     })
