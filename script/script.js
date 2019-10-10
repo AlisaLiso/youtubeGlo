@@ -85,16 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
   }
-
-  // модальное окно
-  {
-    document.body.insertAdjacentHTML('beforeend', `
-      <div class="youTuberModal">
-        <div id="youtuberClose">&#215;</div>
-        <div id="youtuberContainer"></div>
-      </div>
-    `);
-
+  
+  // 
+  const youtuberCall = () => {
     const qw = [3840, 2560, 1920, 1280, 854, 640, 426, 256];
     const qh = [2160, 1440, 1080, 720, 480, 360, 240, 144];
 
@@ -144,5 +137,135 @@ document.addEventListener('DOMContentLoaded', () => {
       youtuberContainer.textContent = '';
       window.removeEventListener('resize', sizeVideo);
     })
+  }
+  
+  // модальное окно
+  {
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="youTuberModal">
+        <div id="youtuberClose">&#215;</div>
+        <div id="youtuberContainer"></div>
+      </div>
+    `);
+    
+    youtuberCall();
+  }
+    
+  // API
+  {
+ 
+    // авторизация
+    {
+      
+      const buttonAuth = document.getElementById('authorize');
+      const blockAuth = document.querySelector('.auth');
+      
+      gapi.load("client:auth2", () => gapi.auth2.init({client_id: CLIENT_ID}) ); 
+      
+      const authenticate = () => gapi.auth2.getAuthInstance()
+        .signIn({scope: "https://www.googleapis.com/auth/youtube.readonly"})
+        .then(() => { console.log("Sign-in successful"); })
+        .catch((err) => errorAuth);
+      
+      const loadClient = () => {
+        gapi.client.setApiKey(API_KEY);
+        return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
+          .then(() => { console.log("GAPI client loaded for API"); })
+          .then(() => blockAuth.style.display = 'none')
+          .catch((err) => errorAuth);
+      }
+      
+      buttonAuth.addEventListener('click', () => {
+        authenticate().then(loadClient);
+      });
+      
+      const errorAuth = (error) => {
+        console.error(error);
+        blockAuth.style.display = '';
+      };
+    }
+    
+    // request
+    {
+      const gloTube = document.querySelector('.logo-academy');
+      const trends = document.getElementById('yt_trend');
+      const likes = document.getElementById('like');
+      const main = document.getElementById('main');
+      
+      const request = (options) => gapi.client.youtube[options.method]
+        .list(options)
+        .then((response) => response.result.items)
+        .then(render)
+        .then(youtuberCall)
+        .catch((error) => console.log(error));
+        
+      const render = (data) => {
+        const youtubeWrapper = document.getElementById('yt-wrapper');
+        youtubeWrapper.textContent = '';
+        data.forEach((item) => {
+          try {
+            const {
+              id, 
+              id:{videoId}, 
+              snippet: {
+                channelTitle, 
+                title, 
+                resourceId:{ videoId: snippetVideoId } = {}, 
+                thumbnails:{ high: {url} },
+              }
+            } = item;
+            youtubeWrapper.innerHTML += `
+              <div class="yt" data-youtuber=${videoId || id || snippetVideoId}>
+                <div class="yt-thumbnail" style="--aspect-ratio:16/9;">
+                  <img src=${url} alt="thumbnail" class="yt-thumbnail__img">
+                </div>
+                <div class="yt-title">${title}</div>
+                <div class="yt-channel">${channelTitle}</div>
+              </div>
+            `;
+          } catch (error) {
+            console.error(error);
+          }
+        })
+      };
+      
+      gloTube.addEventListener('click', () => {
+        request({
+          method: 'search',
+          part: 'snippet',
+          channelId: 'UCVswRUcKC-M35RzgPRv8qUg',
+          order: 'date',
+          maxResults: 6,
+        })
+      });
+      
+      trends.addEventListener('click', () => {
+        request({
+          method: 'videos',
+          part: 'snippet',
+          chart: 'mostPopular',
+          maxResults: 6,
+          regionCode: 'RU',
+        })
+      });
+      
+      likes.addEventListener('click', () => {
+        request({
+          method: 'playlistItems',
+          part: 'snippet',
+          playlistId: LIKES_ID,
+          maxResults: 6,
+        })
+      });
+      
+      main.addEventListener('click', () => {
+        request({
+          method: 'playlists',
+          part: 'snippet',
+          channelId: 'UCVswRUcKC-M35RzgPRv8qUg',
+          maxResults: 6,
+        })
+      });
+    }
   }
 })
