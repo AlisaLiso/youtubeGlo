@@ -153,9 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
   // API
   {
-    const API_KEY = apiKey;
-    const CLIENT_ID = clientId;
-    const LIKES_ID = likesId;
+    const API_KEY = API_KEY;
+    const CLIENT_ID = CLIENT_ID;
+    const LIKES_ID = LIKES_ID;
  
     // авторизация
     {
@@ -205,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
       const render = (data) => {
         const youtubeWrapper = document.getElementById('yt-wrapper');
+        
         youtubeWrapper.textContent = '';
         data.forEach((item) => {
           try {
@@ -227,10 +228,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="yt-channel">${channelTitle}</div>
               </div>
             `;
+            console.log(container)
           } catch (error) {
             console.error(error);
           }
         });
+        
         youtuberCall()
       };
       
@@ -307,8 +310,8 @@ document.addEventListener('DOMContentLoaded', () => {
         request({
           method: 'playlists',
           part: 'snippet',
-          channelId: 'UCVswRUcKC-M35RzgPRv8qUg',
           maxResults: 6,
+          mine: true
         })
       });
       
@@ -329,7 +332,9 @@ document.addEventListener('DOMContentLoaded', () => {
           searchForm.style.border = '1px solid tomato' 
           return
         };
+        
         searchForm.style.border = ''; 
+        
         request({
           method: 'search',
           part: 'snippet',
@@ -337,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
           maxResults: 6,
           q: valueInput,          
         })
-        
+                
         searchForm.elements[0].value = '';
       })
     }
